@@ -20,11 +20,21 @@ import AboutPage from "./components/aboutPage/AboutPage";
 import ResetPassword from "./components/Auth/ResetPassword";
 import Footer from "./components/Footer/Footer";
 
+// This is the main App component that sets up the routing for the application.
+// It uses React Router to define different routes for the application.
 const App = () => {
   return (
+    // The Router component wraps the entire application to enable routing.
+    // Routing means that the application can navigate between different pages without reloading the entire page.
+    // The Routes component defines the different routes for the application.
     <Router>
+      {/* The Navbar component is displayed at the top of the application. */}
       <Navbar />
       <Toaster position="bottom-center" reverseOrder={false} />
+      {/* The Routes component defines the different routes for the application. */}
+      {/* Each Route component defines a path and the component that should be rendered when that path is accessed. */}
+      {/* The element prop specifies the component to render when the route matches. */}
+      {/* You can see that these routes are not protected using the ProtectedRoute component. */}
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
@@ -34,9 +44,13 @@ const App = () => {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
+        {/* The following routes are protected using the ProtectedRoute component. */}
+        {/* This means that the user must be authenticated to access these routes. */}
+
         <Route
           path="/notes/:id"
           element={
+            // The ProtectedRoute component checks if the user is authenticated before rendering the NoteDetails component.
             <ProtectedRoute>
               <NoteDetails />
             </ProtectedRoute>
@@ -58,8 +72,9 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-        
+
         <Route path="/access-denied" element={<AccessDenied />} />
+
         <Route
           path="/admin/*"
           element={
@@ -68,6 +83,7 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/profile"
           element={
@@ -76,8 +92,11 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+
         <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
 
+        {/* The following route is used to handle any undefined routes. */}
+        {/* If the user tries to access a route that is not defined, they will be redirected to the NotFound component. */}
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
