@@ -4,16 +4,22 @@ import { IoMenu } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
 import { useMyContext } from "../store/ContextApi";
 
+//This Navbar component is used to display the navigation bar in the application.
+// It contains links to different pages and handles the opening and closing of the menu for tablet/mobile devices.
 const Navbar = () => {
+
   //handle the header opening and closing menu for the tablet/mobile device
   const [headerToggle, setHeaderToggle] = useState(false);
+  //useLocation is used to get the current location object
   const pathName = useLocation().pathname;
+  //useNavigate is used to navigate to different routes
   const navigate = useNavigate();
 
   // Access the states by using the useMyContext hook from the ContextProvider
-  const { token, setToken, setCurrentUser, isAdmin, setIsAdmin } =
-    useMyContext();
+  const { token, setToken, setCurrentUser, isAdmin, setIsAdmin } = useMyContext();
 
+  //handleLogout function is used to handle the logout functionality
+  // It removes the JWT token and user details from localStorage and updates the state in the ContextProvider
   const handleLogout = () => {
     localStorage.removeItem("JWT_TOKEN"); // Updated to remove token from localStorage
     localStorage.removeItem("USER"); // Remove user details as well
@@ -25,7 +31,10 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  // The Navbar component returns the navigation bar with links to different pages
+  // It uses the useMyContext hook to access the token and isAdmin state from the ContextProvider
   return (
+    //It has several links to different pages like My Notes, Create Note, Contact, About, Profile, and Admin.
     <header className="h-headerHeight z-50 text-textColor bg-headerColor shadow-sm  flex items-center sticky top-0">
       <nav className="sm:px-10 px-4 flex w-full h-full items-center justify-between">
         <Link to="/">
