@@ -75,8 +75,12 @@ const App = () => {
           }
         />
 
+        {/* if user which is not an admin try to access the admin page then it will redirect to the access-denied page */}
         <Route path="/access-denied" element={<AccessDenied />} />
 
+        {/* The following route is used to handle the admin panel. */}
+        {/* The ProtectedRoute component checks if the user is authenticated and has admin rights before rendering the Admin component. */}
+        {/* If the user is not authenticated or does not have admin rights, they will be redirected to the access-denied page. */}
         <Route
           path="/admin/*"
           element={

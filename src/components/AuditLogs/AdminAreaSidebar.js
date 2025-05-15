@@ -6,6 +6,8 @@ import { FaUser } from "react-icons/fa";
 import Tooltip from "@mui/material/Tooltip";
 import { useMyContext } from "../../store/ContextApi";
 
+// This Sidebar component is used to display the sidebar in the admin area of the application.
+// It contains links to different pages and handles the opening and closing of the sidebar.
 const Sidebar = () => {
   // Access the openSidebar and setOpenSidebar function using the useMyContext hook from the ContextProvider
   const { openSidebar, setOpenSidebar } = useMyContext();

@@ -7,7 +7,6 @@ import { useMyContext } from "../store/ContextApi";
 //This Navbar component is used to display the navigation bar in the application.
 // It contains links to different pages and handles the opening and closing of the menu for tablet/mobile devices.
 const Navbar = () => {
-
   //handle the header opening and closing menu for the tablet/mobile device
   const [headerToggle, setHeaderToggle] = useState(false);
   //useLocation is used to get the current location object
@@ -16,7 +15,8 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   // Access the states by using the useMyContext hook from the ContextProvider
-  const { token, setToken, setCurrentUser, isAdmin, setIsAdmin } = useMyContext();
+  const { token, setToken, setCurrentUser, isAdmin, setIsAdmin } =
+    useMyContext();
 
   //handleLogout function is used to handle the logout functionality
   // It removes the JWT token and user details from localStorage and updates the state in the ContextProvider
@@ -102,8 +102,11 @@ const Navbar = () => {
                   Profile
                 </li>
               </Link>{" "}
+              {/*Here we written a login when Admin Tab will be shown*/}
               {isAdmin && (
                 <Link to="/admin/users">
+                  {" "}
+                  {/*"/admin/users" link is given show when admin tab is clicked it will redirect to List of users (here we can also replace this with "/admin/audit") if we want to access other link there is sidebar added for this in Admin Componet */}
                   <li
                     className={` py-2 cursor-pointer uppercase   hover:text-slate-300 ${
                       pathName.startsWith("/admin") ? "font-semibold " : ""
