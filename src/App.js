@@ -56,6 +56,8 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+
+        {/*Here we are mapping this url of our application to the AllNotes component.*/}
         <Route
           path="/notes"
           element={
