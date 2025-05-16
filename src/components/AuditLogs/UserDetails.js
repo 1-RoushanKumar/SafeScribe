@@ -8,13 +8,17 @@ import Buttons from "../../utils/Buttons";
 import toast from "react-hot-toast";
 import Errors from "../Errors";
 
+//This is where we will show the specific user details and also update the user details.
+
+//UserDetails component is used to show the user details and also update the user details
 const UserDetails = () => {
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm({
+  } = useForm({ 
+  //useForm is a custom hook that helps to manage the form state and validation
     defaultValues: {
       username: "",
       email: "",
@@ -34,6 +38,7 @@ const UserDetails = () => {
   const [error, setError] = useState(null);
   const [isEditingPassword, setIsEditingPassword] = useState(false);
 
+  //fetch user details by using the userId from the url
   const fetchUserDetails = useCallback(async () => {
     setLoading(true);
     try {
