@@ -46,6 +46,11 @@ const Sidebar = () => {
         )}
       </div>
 
+      {/* Sidebar links */}
+      {/* First one for all users and the second one for audit logs */}
+      {/* For All users it refers to /admin/users and for audit logs it refers to /admin/audit-logs */}
+      {/* And both link lead to path which is present in Admin.js file */}
+      
       <div className="flex flex-col gap-5 mt-4">
         <Tooltip title={`${openSidebar ? "" : "All Users"}`}>
           <Link

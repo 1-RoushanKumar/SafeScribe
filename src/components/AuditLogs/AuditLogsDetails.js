@@ -6,9 +6,11 @@ import { Blocks } from "react-loader-spinner";
 import Errors from "../Errors.js";
 import moment from "moment";
 
+//This is where we will show the audit logs for a specific note
 //importing the the columns from the auditlogs
-import { auditLogscolumn } from "../../utils/tableColumn.js";
+import { auditLogscolumn } from "../../utils/tableColumn.js"; //in auditlogDetails componet we also need the columns. which is imported from utils/tableColumn.js
 
+//The AuditLogsDetails component is used to display the details of a specific audit log.
 const AuditLogsDetails = () => {
   //access the notid
   const { noteId } = useParams();
@@ -16,11 +18,13 @@ const AuditLogsDetails = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  //fetching the audit logs for a specific note
+  //useCallback is used to memoize the function so that it doesn't get recreated on every render
   const fetchSingleAuditLogs = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await api.get(`/audit/note/${noteId}`);
-
+      const { data } = await api.get(`/audit/note/${noteId}`); //it will fetch all audit logs from the /audit/note/:noteId endpoint from the server
+      //and set the data to the auditLogs state
       setAuditLogs(data);
     } catch (err) {
       setError(err?.response?.data?.message);
@@ -30,12 +34,16 @@ const AuditLogsDetails = () => {
     }
   }, [noteId]);
 
+  //This useEffect is used to fetch the audit logs when the component is mounted
+  //and it will call the fetchSingleAuditLogs function
   useEffect(() => {
     if (noteId) {
       fetchSingleAuditLogs();
     }
-  }, [noteId, fetchSingleAuditLogs]);
+  }, [noteId, fetchSingleAuditLogs]); //
 
+
+  //This is used to set the data for each rows in the table according to the field name in columns
   const rows = auditLogs.map((item) => {
     const formattedDate = moment(item.timestamp).format(
       "MMMM DD, YYYY, hh:mm A"

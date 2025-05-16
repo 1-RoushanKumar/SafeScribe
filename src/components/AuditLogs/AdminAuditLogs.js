@@ -11,6 +11,9 @@ import { MdDateRange } from "react-icons/md";
 
 //Material ui data grid has used for the table
 //initialize the columns for the tables and (field) value is used to show data in a specific column dynamically
+//This is the one who will show all the audit logs
+
+//First we created the columns for the table
 export const auditLogcolumns = [
   {
     field: "actions",
@@ -91,6 +94,8 @@ export const auditLogcolumns = [
       return <p className=" text-slate-700 text-center   ">{response}</p>;
     },
   },
+  //This is also one part of the column which hava button Views which will redirect to the AuditLogsDetails page
+  //Where it will show the details of the audit logs for each specific note.
   {
     field: "action",
     headerName: "Action",
@@ -105,6 +110,8 @@ export const auditLogcolumns = [
     renderHeader: (params) => <span>Action</span>,
     renderCell: (params) => {
       return (
+        //This link will redirect to Admin.js file where the path is defined then it will redirect to AuditLogsDetails.js file
+        //Where the details of the audit logs will be shown
         <Link
           to={`/admin/audit-logs/${params.row.noteId}`}
           className="h-full flex justify-center  items-center   "
@@ -118,15 +125,21 @@ export const auditLogcolumns = [
   },
 ];
 
+//This is the main component for the audit logs
+//This component is used to show the list of all audit logs in the system
+//This component is used to show the audit logs for all users
 const AdminAuditLogs = () => {
+  //first we created the states for the audit logs, error and loading
   const [auditLogs, setAuditLogs] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  //This function is used to fetch the audit logs from the server
   const fetchAuditLogs = async () => {
     setLoading(true);
     try {
-      const response = await api.get("/audit");
+      const response = await api.get("/audit"); //it will fetch all audit logs from the /audit endpoint from the server
+      //and set the data to the auditLogs state
       setAuditLogs(response.data);
     } catch (err) {
       setError(err?.response?.data?.message);
@@ -136,10 +149,13 @@ const AdminAuditLogs = () => {
     }
   };
 
+  //This useEffect is used to fetch the audit logs when the component is mounted
+  //and it will call the fetchAuditLogs function
   useEffect(() => {
     fetchAuditLogs();
   }, []);
 
+  //This is used to set the data for each rows in the table according to the field name in columns
   const rows = auditLogs.map((item) => {
     //format the time bu using moment npm package
 
