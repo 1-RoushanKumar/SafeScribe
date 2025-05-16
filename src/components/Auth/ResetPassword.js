@@ -7,6 +7,7 @@ import InputField from "../InputField/InputField";
 import toast from "react-hot-toast";
 import Buttons from "../../utils/Buttons";
 
+//This is the ResetPassword component that allows users to reset their password by entering their new password.
 const ResetPassword = () => {
   const {
     register,

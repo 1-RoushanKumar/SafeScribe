@@ -9,6 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useMyContext } from "../../store/ContextApi";
 
+//This is the ForgotPassword component that allows users to reset their password by entering their email address.
 const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -28,6 +29,8 @@ const ForgotPassword = () => {
     mode: "onTouched",
   });
 
+  //onSubmit function that will be called when the form is submitted
+  //this function will send a post request to the server with the email address
   const onPasswordForgotHandler = async (data) => {
     //destructuring email from the data object
     const { email } = data;
