@@ -99,6 +99,8 @@ const App = () => {
           }
         />
 
+        {/* The following route is used to handle the OAuth2 redirect after authentication. */}
+        {/* The OAuth2RedirectHandler component is responsible for handling the redirect from the OAuth2 provider. */}
         <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
 
         {/* The following route is used to handle any undefined routes. */}

@@ -153,7 +153,8 @@ const Login = () => {
                     <FaGithub className="text-2xl" />
                   </span>
                   <span className="font-semibold sm:text-customText text-xs">
-                    Login with Github
+                    Login with Github{" "}
+                    {/*here i added github login functionality*/}
                   </span>
                 </Link>
               </div>
