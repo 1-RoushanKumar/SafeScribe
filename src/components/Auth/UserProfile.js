@@ -16,6 +16,8 @@ import { Blocks } from "react-loader-spinner";
 import moment from "moment";
 import Errors from "../Errors";
 
+//Here User can see his/her profile and update the credentials
+//Here we added the 2fa functionality.
 const UserProfile = () => {
   // Access the currentUser and token hook using the useMyContext custom hook from the ContextProvider
   const { currentUser, token } = useMyContext();
@@ -59,8 +61,7 @@ const UserProfile = () => {
     mode: "onTouched",
   });
 
-  //fetching the 2fa sttaus
-
+  //fetching the 2fa status it is enabled or not in database.
   useEffect(() => {
     setPageLoader(true);
 

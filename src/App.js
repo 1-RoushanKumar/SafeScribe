@@ -90,6 +90,7 @@ const App = () => {
           }
         />
 
+        {/* /profile link is coming from the navbar and it will redirect to the UserProfile page */}
         <Route
           path="/profile"
           element={
