@@ -6,6 +6,7 @@ import UserDetails from "./UserDetails";
 import { useMyContext } from "../../store/ContextApi";
 import AuditLogsDetails from "./AuditLogsDetails";
 import AdminAuditLogs from "./AdminAuditLogs";
+import AdminContactMessages from "../contactPage/AdminContactMessages";
 
 const Admin = () => {
   // Access the openSidebar hook using the useMyContext hook from the ContextProvider
@@ -28,6 +29,8 @@ const Admin = () => {
           {/* If you see there is no button for this in the sidebar because we can access this using Views button inside the Audit-log detail page*/}
           <Route path="users" element={<UserList />} />
           <Route path="users/:userId" element={<UserDetails />} />
+          {/* This route renders the AdminContactMessages component when the path is "/admin/contact-messages" */}
+          <Route path="contact-messages" element={<AdminContactMessages />} />
           {/* Add other routes as necessary */}
         </Routes>
       </div>

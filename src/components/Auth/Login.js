@@ -41,6 +41,7 @@ const Login = () => {
   const handleSuccessfulLogin = (token, decodedToken) => {
     const user = {
       username: decodedToken.sub,
+      email: decodedToken.email || "", // Add email extraction here (here i extracted email from the decoded token)
       roles: decodedToken.roles ? decodedToken.roles.split(",") : [],
     };
     localStorage.setItem("JWT_TOKEN", token);

@@ -89,6 +89,17 @@ const Navbar = () => {
             >
               About
             </li>
+            {/* This link is used to navigate to the My Messages page. */}
+          </Link>
+
+          <Link to="/my-messages">
+            <li
+              className={` py-2 cursor-pointer hover:text-slate-300 ${
+                pathName === "/my-messages" ? "font-semibold " : ""
+              } `}
+            >
+              My Messages
+            </li>
           </Link>
 
           {token ? (
