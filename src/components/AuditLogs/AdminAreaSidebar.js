@@ -109,7 +109,7 @@ const Sidebar = () => {
                 !openSidebar ? "opacity-0" : ""
               } transition-all font-semibold duration-150 ease-in-out`}
             >
-              Contact Messages
+              Messages
             </span>
           </Link>
         </Tooltip>

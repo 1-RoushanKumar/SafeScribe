@@ -16,15 +16,17 @@ const fadeInFromBotom = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
+const baseButtonClasses =
+  "sm:w-52 w-44 font-semibold hover:scale-105 transition-all duration-200 cursor-pointer text-white px-10 py-3 rounded-sm";
+
 const LandingPage = () => {
-  // Access the token  state by using the useMyContext hook from the ContextProvider
   const { token } = useMyContext();
 
   return (
     <div className="min-h-[calc(100vh-74px)] flex justify-center">
-      <div className="lg:w-[80%] w-full py-16  space-y-4  ">
+      <div className="lg:w-[80%] w-full py-16 space-y-4">
         <motion.h1
-          className="font-montserrat uppercase text-headerColor  xl:text-headerText md:text-4xl text-2xl mx-auto text-center font-bold sm:w-[95%] w-full"
+          className="font-montserrat uppercase text-headerColor xl:text-headerText md:text-4xl text-2xl mx-auto text-center font-bold sm:w-[95%] w-full"
           initial="hidden"
           animate="visible"
           variants={fadeInFromTop}
@@ -43,17 +45,17 @@ const LandingPage = () => {
           initial="hidden"
           animate="visible"
           variants={fadeInFromBotom}
-          className="flex items-center justify-center gap-3 py-10 "
+          className="flex items-center justify-center gap-3 py-10"
         >
           {token ? (
             <>
               <Link to="/create-note">
-                <Buttons className="sm:w-52 w-44 bg-customRed font-semibold hover:scale-105 transition-all duration-200 cursor-pointer text-white px-10 py-3 rounded-sm">
+                <Buttons className={`${baseButtonClasses} bg-customRed`}>
                   Create Note
                 </Buttons>
               </Link>
               <Link to="/notes">
-                <Buttons className="sm:w-52 w-44 bg-btnColor font-semibold hover:scale-105 transition-all duration-200 cursor-pointer text-white px-10 py-3 rounded-sm">
+                <Buttons className={`${baseButtonClasses} bg-btnColor`}>
                   My Notes
                 </Buttons>
               </Link>
@@ -61,32 +63,34 @@ const LandingPage = () => {
           ) : (
             <>
               <Link to="/login">
-                <Buttons className="sm:w-52 w-44 bg-customRed font-semibold hover:scale-105 transition-all duration-200 cursor-pointer text-white px-10 py-3 rounded-sm">
+                <Buttons className={`${baseButtonClasses} bg-customRed`}>
                   SignIn
                 </Buttons>
               </Link>
               <Link to="/signup">
-                <Buttons className="sm:w-52 w-44 bg-btnColor font-semibold hover:scale-105 transition-all duration-200 cursor-pointer text-white px-10 py-3 rounded-sm">
+                <Buttons className={`${baseButtonClasses} bg-btnColor`}>
                   SignUp
                 </Buttons>
               </Link>
             </>
           )}
         </motion.div>
-        .
+
         <div className="sm:pt-14 pt-0 xl:px-16 md:px-10">
-          <h1 className="font-montserrat uppercase text-headerColor  xl:text-headerText md:text-4xl text-2xl  mx-auto text-center font-bold  w-full">
+          <h1 className="font-montserrat uppercase text-headerColor xl:text-headerText md:text-4xl text-2xl mx-auto text-center font-bold w-full">
             More Reasons Company Around the world workable
           </h1>
           <Brands />
           <State />
           <div className="pb-10">
-            <h1
-              className="font-montserrat uppercase text-headerColor pb-16  xl:text-headerText md:text-4xl text-2xl  mx-auto text-center font-bold sm:w-[95%] w-full"
+            <motion.h1
+              className="font-montserrat uppercase text-headerColor pb-16 xl:text-headerText md:text-4xl text-2xl mx-auto text-center font-bold sm:w-[95%] w-full"
+              initial="hidden"
+              animate="visible"
               variants={fadeInFromBotom}
             >
               Testimonial
-            </h1>
+            </motion.h1>
             <Testimonial />
           </div>
         </div>

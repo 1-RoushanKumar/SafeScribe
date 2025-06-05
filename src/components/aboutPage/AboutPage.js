@@ -4,10 +4,10 @@ import { FaGithub, FaEnvelope, FaTwitter, FaLinkedinIn } from "react-icons/fa";
 
 const AboutPage = () => {
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
+    <div className="p-6 bg-gray-100 h-[495px]">
       <div className="md:w-1/2">
-        <h1 className="text-4xl font-bold mb-4">About Us</h1>
-        <p className="mb-4 text-stone-800 text-2xl">
+        <h1 className="text-3xl font-bold mb-3">About Us</h1>
+        <p className="mb-4 text-stone-800 text-xl">
           Welcome to <strong>SafeScribe</strong>, your trusted companion for
           secure and private note-taking. We believe in providing a safe space
           where your thoughts and ideas are protected with the highest level of
@@ -33,7 +33,7 @@ const AboutPage = () => {
           </li>
         </ul>
 
-        <div className="flex space-x-4 mt-10">
+        <div className="flex space-x-4 mt-6">
           <a
             href="https://github.com/YourGitHubUsername"
             target="_blank"

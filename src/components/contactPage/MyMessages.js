@@ -84,7 +84,7 @@ const MyMessages = () => {
   };
 
   return (
-    <div className="p-4 max-w-2xl mx-auto min-h-[490px] flex flex-col">
+    <div className="p-5 max-w-2xl mx-auto min-h-[493px] flex flex-col">
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
       <h2 className="text-2xl font-bold mb-4">Check Your Messages</h2>
 

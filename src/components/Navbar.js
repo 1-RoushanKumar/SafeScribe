@@ -3,26 +3,20 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { IoMenu } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
 import { useMyContext } from "../store/ContextApi";
+import { FaShieldAlt } from "react-icons/fa";
+import { PiNotePencilFill } from "react-icons/pi";
 
-//This Navbar component is used to display the navigation bar in the application.
-// It contains links to different pages and handles the opening and closing of the menu for tablet/mobile devices.
 const Navbar = () => {
-  //handle the header opening and closing menu for the tablet/mobile device
   const [headerToggle, setHeaderToggle] = useState(false);
-  //useLocation is used to get the current location object
   const pathName = useLocation().pathname;
-  //useNavigate is used to navigate to different routes
   const navigate = useNavigate();
 
-  // Access the states by using the useMyContext hook from the ContextProvider
   const { token, setToken, setCurrentUser, isAdmin, setIsAdmin } =
     useMyContext();
 
-  //handleLogout function is used to handle the logout functionality
-  // It removes the JWT token and user details from localStorage and updates the state in the ContextProvider
   const handleLogout = () => {
-    localStorage.removeItem("JWT_TOKEN"); // Updated to remove token from localStorage
-    localStorage.removeItem("USER"); // Remove user details as well
+    localStorage.removeItem("JWT_TOKEN");
+    localStorage.removeItem("USER");
     localStorage.removeItem("CSRF_TOKEN");
     localStorage.removeItem("IS_ADMIN");
     setToken(null);
@@ -31,127 +25,141 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  // The Navbar component returns the navigation bar with links to different pages
-  // It uses the useMyContext hook to access the token and isAdmin state from the ContextProvider
+  const handleNavClick = () => {
+    setHeaderToggle(false);
+  };
+
+  const navItemClasses = "py-2 cursor-pointer hover:text-slate-300";
+
   return (
-    //It has several links to different pages like My Notes, Create Note, Contact, About, Profile, and Admin.
-    <header className="h-headerHeight z-50 text-textColor bg-headerColor shadow-sm  flex items-center sticky top-0">
+    <header className="h-headerHeight z-50 text-textColor bg-headerColor shadow-sm flex items-center sticky top-0">
       <nav className="sm:px-10 px-4 flex w-full h-full items-center justify-between">
-        <Link to="/">
-          {" "}
-          <h3 className=" font-dancingScript text-logoText">Secure Notes</h3>
+        <Link
+          to="/"
+          onClick={handleNavClick}
+          className="flex items-center gap-2"
+        >
+          <FaShieldAlt className="text-customRed text-2xl sm:text-3xl" />
+          <h3 className="font-montserrat font-semibold text-lg sm:text-2xl tracking-wider uppercase text-logoText">
+            SafeScribe
+          </h3>
+          <PiNotePencilFill className="text-customRed text-xl sm:text-2xl" />
         </Link>
+
         <ul
-          className={`lg:static  absolute left-0  top-16 w-full lg:w-fit lg:px-0 sm:px-10 px-4  lg:bg-transparent bg-headerColor   ${
+          className={`lg:static absolute left-0 top-16 w-full lg:w-fit lg:px-0 sm:px-10 px-4 lg:bg-transparent bg-headerColor ${
             headerToggle
               ? "min-h-fit max-h-navbarHeight lg:py-0 py-4 shadow-md shadow-slate-700 lg:shadow-none"
-              : "h-0 overflow-hidden "
-          }  lg:h-auto transition-all duration-100 font-montserrat text-textColor flex lg:flex-row flex-col lg:gap-8 gap-2`}
+              : "h-0 overflow-hidden"
+          } lg:h-auto transition-all duration-100 font-montserrat text-textColor flex lg:flex-row flex-col lg:gap-8 gap-2`}
         >
           {token && (
             <>
-              <Link to="/notes">
-                <li
-                  className={` ${
-                    pathName === "/notes" ? "font-semibold " : ""
-                  } py-2 cursor-pointer  hover:text-slate-300 `}
-                >
+              <li
+                className={`${navItemClasses} ${
+                  pathName === "/notes" ? "font-semibold" : ""
+                }`}
+              >
+                <Link to="/notes" onClick={handleNavClick}>
                   My Notes
-                </li>
-              </Link>
-              <Link to="/create-note">
-                <li
-                  className={` py-2 cursor-pointer  hover:text-slate-300 ${
-                    pathName === "/create-note" ? "font-semibold " : ""
-                  } `}
-                >
+                </Link>
+              </li>
+              <li
+                className={`${navItemClasses} ${
+                  pathName === "/create-note" ? "font-semibold" : ""
+                }`}
+              >
+                <Link to="/create-note" onClick={handleNavClick}>
                   Create Note
-                </li>
-              </Link>
+                </Link>
+              </li>
             </>
           )}
 
-          <Link to="/contact">
-            <li
-              className={`${
-                pathName === "/contact" ? "font-semibold " : ""
-              } py-2 cursor-pointer hover:text-slate-300`}
-            >
+          <li
+            className={`${navItemClasses} ${
+              pathName === "/contact" ? "font-semibold" : ""
+            }`}
+          >
+            <Link to="/contact" onClick={handleNavClick}>
               Contact
-            </li>
-          </Link>
+            </Link>
+          </li>
 
-          <Link to="/about">
-            <li
-              className={`py-2 cursor-pointer hover:text-slate-300 ${
-                pathName === "/about" ? "font-semibold " : ""
-              }`}
-            >
+          <li
+            className={`${navItemClasses} ${
+              pathName === "/about" ? "font-semibold" : ""
+            }`}
+          >
+            <Link to="/about" onClick={handleNavClick}>
               About
-            </li>
-            {/* This link is used to navigate to the My Messages page. */}
-          </Link>
+            </Link>
+          </li>
 
-          <Link to="/my-messages">
-            <li
-              className={` py-2 cursor-pointer hover:text-slate-300 ${
-                pathName === "/my-messages" ? "font-semibold " : ""
-              } `}
-            >
+          <li
+            className={`${navItemClasses} ${
+              pathName === "/my-messages" ? "font-semibold" : ""
+            }`}
+          >
+            <Link to="/my-messages" onClick={handleNavClick}>
               My Messages
-            </li>
-          </Link>
+            </Link>
+          </li>
 
           {token ? (
             <>
-              <Link to="/profile">
+              <li
+                className={`${navItemClasses} ${
+                  pathName === "/profile" ? "font-semibold" : ""
+                }`}
+              >
+                <Link to="/profile" onClick={handleNavClick}>
+                  Profile
+                </Link>
+              </li>
+              {isAdmin && (
                 <li
-                  className={` py-2 cursor-pointer  hover:text-slate-300 ${
-                    pathName === "/profile" ? "font-semibold " : ""
+                  className={`${navItemClasses} uppercase ${
+                    pathName.startsWith("/admin") ? "font-semibold" : ""
                   }`}
                 >
-                  Profile
-                </li>
-              </Link>{" "}
-              {/*Here we written a login when Admin Tab will be shown*/}
-              {isAdmin && (
-                <Link to="/admin/users">
-                  {" "}
-                  {/*"/admin/users" link is given show when admin tab is clicked it will redirect to List of users (here we can also replace this with "/admin/audit") if we want to access other link there is sidebar added for this in Admin Componet */}
-                  <li
-                    className={` py-2 cursor-pointer uppercase   hover:text-slate-300 ${
-                      pathName.startsWith("/admin") ? "font-semibold " : ""
-                    }`}
-                  >
+                  <Link to="/admin/users" onClick={handleNavClick}>
                     Admin
-                  </li>
-                </Link>
+                  </Link>
+                </li>
               )}
-              <button
-                onClick={handleLogout}
-                className="w-24 text-center bg-customRed font-semibold px-4 py-2 rounded-sm cursor-pointer hover:text-slate-300"
-              >
-                LogOut
-              </button>
+              <li>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    handleNavClick();
+                  }}
+                  className="w-24 text-center bg-customRed font-semibold px-4 py-2 rounded-sm cursor-pointer hover:text-slate-300"
+                >
+                  LogOut
+                </button>
+              </li>
             </>
           ) : (
-            <Link to="/signup">
-              <li className="w-24 text-center bg-btnColor font-semibold px-4 py-2 rounded-sm cursor-pointer hover:text-slate-300">
+            <li className="w-24 text-center bg-btnColor font-semibold px-4 py-2 rounded-sm cursor-pointer hover:text-slate-300">
+              <Link to="/signup" onClick={handleNavClick}>
                 SignUp
-              </li>
-            </Link>
+              </Link>
+            </li>
           )}
         </ul>
-        <span
+        <button
           onClick={() => setHeaderToggle(!headerToggle)}
-          className="lg:hidden block cursor-pointer text-textColor  shadow-md hover:text-slate-400"
+          className="lg:hidden block cursor-pointer text-textColor shadow-md hover:text-slate-400"
+          aria-label={headerToggle ? "Close menu" : "Open menu"}
+          aria-expanded={headerToggle}
         >
           {headerToggle ? (
-            <RxCross2 className=" text-2xl" />
+            <RxCross2 className="text-2xl" />
           ) : (
-            <IoMenu className=" text-2xl" />
+            <IoMenu className="text-2xl" />
           )}
-        </span>
+        </button>
       </nav>
     </header>
   );
