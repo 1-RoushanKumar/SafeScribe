@@ -4,120 +4,137 @@ import { Link } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
 import { Blocks } from "react-loader-spinner";
 import toast from "react-hot-toast";
-import { auditLogsTruncateTexts } from "../../utils/truncateText.js";
-import Errors from "../Errors.js";
+import { auditLogsTruncateTexts } from "../../utils/truncateText.js"; // Ensure this path is correct
+import Errors from "../Errors.js"; // Assuming this component is styled well
 import moment from "moment";
-import { MdDateRange } from "react-icons/md";
+import { MdDateRange, MdVisibility } from "react-icons/md"; // Added MdVisibility icon
 
-//Material ui data grid has used for the table
-//initialize the columns for the tables and (field) value is used to show data in a specific column dynamically
-//This is the one who will show all the audit logs
-
-//First we created the columns for the table
+// First, define the columns for the DataGrid table
 export const auditLogcolumns = [
   {
     field: "actions",
     headerName: "Action",
-    width: 160,
-    headerAlign: "center",
-    disableColumnMenu: true,
-    align: "center",
+    minWidth: 160,
+    flex: 0.8, // Make column flexible
+    headerAlign: "left", // Align header to left
+    align: "left", // Align content to left
     editable: false,
-    headerClassName: "text-black font-semibold border",
-    cellClassName: "text-slate-700 font-normal  border",
-    renderHeader: (params) => <span>Action</span>,
+    disableColumnMenu: true,
+    renderHeader: () => (
+      <span className="font-semibold text-gray-700 text-base">Action</span>
+    ),
+    renderCell: (params) => (
+      <div className="font-medium text-gray-800">{params?.value}</div>
+    ),
   },
-
   {
     field: "username",
-    headerName: "UserName",
-    width: 180,
+    headerName: "User Name",
+    minWidth: 180,
+    flex: 1, // Make column flexible
     editable: false,
     disableColumnMenu: true,
-    headerAlign: "center",
-    align: "center",
-    headerClassName: "text-black font-semibold border",
-    cellClassName: "text-slate-700 font-normal  border",
-    renderHeader: (params) => <span>UserName</span>,
+    headerAlign: "left",
+    align: "left",
+    renderHeader: () => (
+      <span className="font-semibold text-gray-700 text-base">User Name</span>
+    ),
+    renderCell: (params) => (
+      <div className="font-medium text-gray-800">{params?.value}</div>
+    ),
   },
-
   {
     field: "timestamp",
-    headerName: "TimeStamp",
+    headerName: "Time Stamp",
     disableColumnMenu: true,
-    width: 220,
+    minWidth: 220,
+    flex: 1.2, // Give more space
     editable: false,
     headerAlign: "center",
     align: "center",
-    headerClassName: "text-black font-semibold border",
-    cellClassName: "text-slate-700 font-normal  border",
-    renderHeader: (params) => <span>TimeStamp</span>,
+    renderHeader: () => (
+      <span className="font-semibold text-gray-700 text-base">Time Stamp</span>
+    ),
     renderCell: (params) => {
       return (
-        <div className=" flex  items-center justify-center  gap-1 ">
-          <span>
-            <MdDateRange className="text-slate-700 text-lg" />
-          </span>
-          <span>{params?.row?.timestamp}</span>
+        <div className="flex items-center justify-center gap-2 text-gray-700">
+          <MdDateRange className="text-lg text-purple-500" />{" "}
+          {/* Styled icon */}
+          <span className="text-sm">{params?.value}</span>
         </div>
       );
     },
   },
   {
     field: "noteid",
-    headerName: "NoteId",
+    headerName: "Note ID",
     disableColumnMenu: true,
-    width: 150,
+    minWidth: 150,
+    flex: 0.7, // Smaller column
     editable: false,
     headerAlign: "center",
     align: "center",
-    headerClassName: "text-black font-semibold border",
-    cellClassName: "text-slate-700 font-normal  border",
-    renderHeader: (params) => <span>NoteId</span>,
+    renderHeader: () => (
+      <span className="font-semibold text-gray-700 text-base">Note ID</span>
+    ),
+    renderCell: (params) => (
+      <div className="font-medium text-gray-800">{params?.value}</div>
+    ),
   },
   {
     field: "note",
     headerName: "Note Content",
-    width: 220,
+    minWidth: 280, // Increased width for content
+    flex: 1.5, // More flexible for content
     editable: false,
-    headerAlign: "center",
+    headerAlign: "left", // Align content header to left
     disableColumnMenu: true,
-    align: "center",
-    headerClassName: "text-black font-semibold border",
-    cellClassName: "text-slate-700 font-normal  border",
-    renderHeader: (params) => <span>Note Content</span>,
+    align: "left", // Align cell content to left
+    renderHeader: () => (
+      <span className="font-semibold text-gray-700 text-base">
+        Note Content
+      </span>
+    ),
     renderCell: (params) => {
-      const contens = JSON.parse(params?.value)?.content;
+      let content = "";
+      try {
+        // Safely parse JSON
+        const parsedContent = JSON.parse(params?.value);
+        content = parsedContent?.content || "";
+      } catch (e) {
+        content = params?.value || ""; // Fallback if not valid JSON
+      }
+      const truncatedResponse = auditLogsTruncateTexts(content);
 
-      const response = auditLogsTruncateTexts(contens);
-
-      return <p className=" text-slate-700 text-center   ">{response}</p>;
+      return (
+        <p className="text-gray-700 text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+          {truncatedResponse}
+        </p>
+      );
     },
   },
-  //This is also one part of the column which hava button Views which will redirect to the AuditLogsDetails page
-  //Where it will show the details of the audit logs for each specific note.
   {
     field: "action",
-    headerName: "Action",
-    width: 150,
+    headerName: "Details", // Changed header to 'Details'
+    minWidth: 120,
+    flex: 0.6, // Smaller column
     editable: false,
     headerAlign: "center",
     align: "center",
-    headerClassName: "text-black font-semibold ",
-    cellClassName: "text-slate-700 font-normal  ",
     sortable: false,
-
-    renderHeader: (params) => <span>Action</span>,
+    disableColumnMenu: true,
+    renderHeader: () => (
+      <span className="font-semibold text-gray-700 text-base">Details</span>
+    ),
     renderCell: (params) => {
       return (
-        //This link will redirect to Admin.js file where the path is defined then it will redirect to AuditLogsDetails.js file
-        //Where the details of the audit logs will be shown
         <Link
           to={`/admin/audit-logs/${params.row.noteId}`}
-          className="h-full flex justify-center  items-center   "
+          className="w-full h-full flex justify-center items-center"
         >
-          <button className="bg-btnColor text-white px-4 flex justify-center items-center  h-9 rounded-md ">
-            Views
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-1 text-sm transition-colors duration-200 ease-in-out">
+            <MdVisibility className="text-lg" /> {/* Added icon */}
+            <span>View</span>
           </button>
         </Link>
       );
@@ -125,53 +142,46 @@ export const auditLogcolumns = [
   },
 ];
 
-//This is the main component for the audit logs
-//This component is used to show the list of all audit logs in the system
-//This component is used to show the audit logs for all users
+// Main component for displaying all audit logs
 const AdminAuditLogs = () => {
-  //first we created the states for the audit logs, error and loading
   const [auditLogs, setAuditLogs] = useState([]);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Set to true initially
 
-  //This function is used to fetch the audit logs from the server
+  // Function to fetch audit logs from the server
   const fetchAuditLogs = async () => {
     setLoading(true);
     try {
-      const response = await api.get("/audit"); //it will fetch all audit logs from the /audit endpoint from the server
-      //and set the data to the auditLogs state
+      const response = await api.get("/audit");
       setAuditLogs(response.data);
     } catch (err) {
-      setError(err?.response?.data?.message);
-      toast.error("Error fetching audit logs");
+      setError(err?.response?.data?.message || "Failed to fetch audit logs.");
+      toast.error("Error fetching audit logs.");
+      console.error("Error fetching audit logs:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  //This useEffect is used to fetch the audit logs when the component is mounted
-  //and it will call the fetchAuditLogs function
+  // Effect hook to fetch audit logs when the component mounts
   useEffect(() => {
     fetchAuditLogs();
   }, []);
 
-  //This is used to set the data for each rows in the table according to the field name in columns
+  // Map audit log data to rows for the DataGrid table
   const rows = auditLogs.map((item) => {
-    //format the time bu using moment npm package
-
+    // Format timestamp using moment.js
     const formattedDate = moment(item.timestamp).format(
-      "MMMM DD, YYYY, hh:mm A"
-    );
+      "MMMM DD, YYYY, hh:mm:ss A"
+    ); // Added seconds for precision
 
-    //set the data for each rows in the table according to the field name in columns
-    //Example: username is the keyword in row it should matche with the field name in column so that the data will show on that column dynamically
     return {
-      id: item.id,
+      id: item.id, // Unique ID for each row
       noteId: item.noteId,
       actions: item.action,
       username: item.username,
       timestamp: formattedDate,
-      noteid: item.noteId,
+      noteid: item.noteId, // Keeping both noteId and noteid for flexibility, though one might suffice
       note: item.noteContent,
     };
   });
@@ -181,52 +191,87 @@ const AdminAuditLogs = () => {
   }
 
   return (
-    <div className="p-4">
-      <div className="py-4">
-        <h1 className="text-center text-2xl font-bold text-slate-800 uppercase">
-          Audit Logs
+    <div className="p-6 bg-gray-50 min-h-[calc(100vh-74px)]">
+      {" "}
+      {/* Page background and min-height */}
+      <div className="max-w-7xl mx-auto">
+        {" "}
+        {/* Centering and max-width for content */}
+        <h1 className="text-center text-3xl sm:text-4xl font-extrabold text-gray-900 mb-8 mt-4">
+          System Audit Logs
         </h1>
-      </div>
-      {loading ? (
-        <>
-          {" "}
-          <div className="flex  flex-col justify-center items-center  h-72">
-            <span>
-              <Blocks
-                height="70"
-                width="70"
-                color="#4fa94d"
-                ariaLabel="blocks-loading"
-                wrapperStyle={{}}
-                wrapperClass="blocks-wrapper"
-                visible={true}
-              />
-            </span>
-            <span>Please wait...</span>
-          </div>
-        </>
-      ) : (
-        <>
-          {" "}
-          <div className="overflow-x-auto w-full mx-auto">
-            <DataGrid
-              className="w-fit mx-auto px-0"
-              rows={rows}
-              columns={auditLogcolumns}
-              initialState={{
-                pagination: {
-                  paginationModel: {
-                    pageSize: 6,
-                  },
-                },
-              }}
-              pageSizeOptions={[6]}
-              disableRowSelectionOnClick
-              disableColumnResize
+        {loading ? (
+          <div className="flex flex-col justify-center items-center min-h-[400px]">
+            <Blocks
+              height="80"
+              width="80"
+              color="#4F46E5" // Updated spinner color
+              ariaLabel="loading-blocks"
+              wrapperClass="blocks-wrapper"
+              visible={true}
             />
+            <span className="text-gray-700 text-lg font-medium mt-4">
+              Loading audit logs...
+            </span>
           </div>
-        </>
-      )}
+        ) : (
+          <div className="bg-white rounded-lg shadow-xl overflow-hidden p-6">
+            {" "}
+            {/* Card-like styling for DataGrid */}
+            {rows.length === 0 ? (
+              <div className="bg-blue-50 border-l-4 border-blue-400 text-blue-800 p-4 rounded-md shadow-sm max-w-lg mx-auto">
+                <p className="font-semibold text-center">
+                  No audit logs available.
+                </p>
+                <p className="text-sm text-center">
+                  There are no recorded actions in the system yet.
+                </p>
+              </div>
+            ) : (
+              <div style={{ height: 500, width: "100%" }}>
+                {" "}
+                {/* DataGrid requires explicit height */}
+                <DataGrid
+                  rows={rows}
+                  columns={auditLogcolumns}
+                  initialState={{
+                    pagination: {
+                      paginationModel: {
+                        pageSize: 10, // Increased default page size
+                      },
+                    },
+                  }}
+                  disableRowSelectionOnClick
+                  pageSizeOptions={[5, 10, 20]} // More pagination options
+                  disableColumnResize
+                  // Custom styling for DataGrid elements using MUI's sx prop
+                  sx={{
+                    "& .MuiDataGrid-columnHeaders": {
+                      backgroundColor: "#F3F4F6", // Light gray background for headers
+                      color: "#1F2937", // Darker text for headers
+                      fontWeight: "bold",
+                      fontSize: "1rem",
+                      borderBottom: "2px solid #E5E7EB", // Subtle border below headers
+                    },
+                    "& .MuiDataGrid-cell": {
+                      borderColor: "#E5E7EB", // Lighter border for cells
+                      padding: "12px 16px", // More padding
+                    },
+                    "& .MuiDataGrid-row:nth-of-type(odd)": {
+                      backgroundColor: "#F9FAFB", // Zebra striping for rows
+                    },
+                    "& .MuiDataGrid-row:hover": {
+                      backgroundColor: "#EFF6FF", // Light blue on row hover
+                      cursor: "pointer",
+                    },
+                    border: "none", // Remove outer border of DataGrid
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

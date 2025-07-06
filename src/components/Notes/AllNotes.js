@@ -1,127 +1,108 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
-import NoteItems from "./NoteItems"; // Importing the NoteItems component to display individual notes if you see when we click MyNotes comes for that user each note card is called NoteItems
-import { FiFilePlus } from "react-icons/fi";
-import { Blocks } from "react-loader-spinner";
+import NoteItems from "./NoteItems";
+import { FiFilePlus } from "react-icons/fi"; // For the "Create New Note" button icon
+import { MdOutlineNotes } from "react-icons/md"; // New icon for the main title
+import { Blocks } from "react-loader-spinner"; // For the main loading spinner
 import Errors from "../Errors";
 
-//AllNotes component is used to display all the notes created by the user.
 const AllNotes = () => {
-  //here we define the state variables using useState hook
   const [notes, setNotes] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Set to true initially as data is being fetched
   const [error, setError] = useState(false);
 
-  //fetchNotes function is used to fetch all the notes from the backend using axios
   const fetchNotes = async () => {
     setLoading(true);
+    setError(false); // Clear previous errors
     try {
-      // Sending a GET request to the backend to fetch all notes
-      // The response is stored in the response variable.
       const response = await api.get("/notes");
-
-      // The response data is an array of notes.
-      // We are mapping through the response data and parsing the content of each note.
       const parsedNotes = response.data.map((note) => ({
-        ...note, // Spread all existing properties of the note object into the new object
-        parsedContent: JSON.parse(note.content).content, // Add a new property 'parsedContent' extracted from the parsed JSON
-        //We using note.content because in our backend we are using content as the key (you can see it in postman when we are creating a note)
-        //Then you thinking why (note.content).content why two times content because in our backend we are using content as the key and in the frontend we are using content as the key so to avoid confusion we are using note.content
+        ...note,
+        // Safely parse content, assuming it's always a JSON string with a 'content' key
+        parsedContent: JSON.parse(note.content).content || "",
       }));
-
-      // Setting the parsed notes to the notes state variable.
       setNotes(parsedNotes);
-    } catch (error) {
-      setError(error.response.data.message);
-      console.error("Error fetching notes", error);
+    } catch (err) {
+      console.error("Error fetching notes:", err);
+      // More user-friendly error message
+      setError(
+        err.response?.data?.message ||
+          "Failed to load notes. Please try again later."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  //useEffect hook is used to fetch all the notes when the component is mounted
-  // The empty dependency array [] means that this effect will only run once when the component is mounted.
   useEffect(() => {
-    //calling the function here to fetch all notes
     fetchNotes();
   }, []);
 
-  //to show an errors
   if (error) {
     return <Errors message={error} />;
   }
 
-  // The component returns a JSX element that renders the AllNotes page.
   return (
-    <div className="min-h-[calc(100vh-74px)] sm:py-10 sm:px-5 px-0 py-4">
-      <div className="w-[92%] mx-auto ">
-        {/* The title of the page is displayed here. */
-        /* If the loading state is false and there are notes, display the title. */}
-        {!loading && notes && notes?.length > 0 && (
-          <h1 className="font-montserrat  text-slate-800 sm:text-4xl text-2xl font-semibold ">
-            My Notes
-          </h1>
+    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section: Title and Create Note Button (when notes exist) */}
+        {!loading && notes?.length > 0 && (
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-8 border-b pb-4 border-gray-200">
+            <h1 className="font-extrabold text-gray-900 text-3xl sm:text-4xl lg:text-5xl flex items-center gap-3 mb-4 sm:mb-0">
+              <MdOutlineNotes className="text-blue-600 text-4xl sm:text-5xl" />
+              My Notes
+            </h1>
+            <Link to="/create-note" className="flex-shrink-0">
+              <button className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-lg font-medium">
+                <FiFilePlus className="mr-2" size={20} />
+                Create New Note
+              </button>
+            </Link>
+          </div>
         )}
-        {/* If the loading state is true, display a loading spinner. */}
-        {/* The Blocks component is a loading spinner that is displayed while the notes are being fetched. */}
-        {/* It is a part of the react-loader-spinner library. */}
+
+        {/* Loading State */}
         {loading ? (
-          <div className="flex  flex-col justify-center items-center  h-72">
-            <span>
-              <Blocks
-                height="70"
-                width="70"
-                color="#4fa94d"
-                ariaLabel="blocks-loading"
-                wrapperStyle={{}}
-                wrapperClass="blocks-wrapper"
-                visible={true}
-              />
+          <div className="flex flex-col justify-center items-center h-[500px] bg-white rounded-lg shadow-md">
+            <Blocks
+              height="80"
+              width="80"
+              color="#4F46E5" // A vibrant blue/indigo color
+              ariaLabel="blocks-loading"
+              visible={true}
+            />
+            <span className="text-gray-700 text-lg font-medium mt-4">
+              Loading your notes...
             </span>
-            <span>Please wait...</span>
           </div>
         ) : (
           <>
-            {/* If there are no notes, display a message to the user. */}
-            {/* The message encourages the user to create a new note. */}
-            {/* The Link component is used to navigate to the CreateNote page when the button is clicked. */}
-            {/* The button has an icon (FiFilePlus) and a label "Create New Note". */}
-            {notes && notes?.length === 0 ? (
-              <div className="flex flex-col items-center justify-center min-h-96  p-4">
-                <div className="text-center">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                    You didn't create any note yet
-                  </h2>
-                  <p className="text-gray-600 mb-6">
-                    Start by creating a new note to keep track of your thoughts.
-                  </p>
-                  <div className="w-full flex justify-center">
-                    <Link to="/create-note">
-                      <button className="flex items-center px-4 py-2 bg-btnColor text-white rounded  focus:outline-none focus:ring-2 focus:ring-blue-300">
-                        <FiFilePlus className="mr-2" size={24} />
-                        Create New Note
-                      </button>
-                    </Link>
-                  </div>
-                </div>
+            {/* Empty Notes State */}
+            {notes?.length === 0 ? (
+              <div className="flex flex-col items-center justify-center min-h-[500px] bg-white rounded-lg shadow-md p-6 text-center">
+                <MdOutlineNotes className="text-gray-400 text-8xl mb-6" />
+                <h2 className="text-3xl font-bold text-gray-800 mb-3">
+                  No Notes Yet!
+                </h2>
+                <p className="text-gray-600 mb-8 text-lg max-w-md">
+                  It looks like you haven't created any notes. Start organizing
+                  your thoughts and ideas now!
+                </p>
+                <Link to="/create-note">
+                  <button className="flex items-center px-8 py-4 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-xl font-semibold">
+                    <FiFilePlus className="mr-3" size={28} />
+                    Create Your First Note
+                  </button>
+                </Link>
               </div>
             ) : (
-              // If there are notes, display them in a grid layout.
-              // The grid layout is responsive and adjusts the number of columns based on the screen size.
-              <>
-                <div className="pt-10 grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-y-10 gap-x-5 justify-center">
-                  {/* The notes are mapped to the NoteItems component, which displays each note. */}
-                  {/* The NoteItems component is passed the note data as props. */}
-                  {/* The key prop is used to uniquely identify each note in the list. */}
-                  {/* The id prop is passed to the NoteItems component to identify the note. */}
-                  {/* The parsedContent prop is passed to display the content of the note. */}
-                  {/* The createdAt prop is passed to display the creation date of the note. */}
-                  {notes.map((item) => (
-                    <NoteItems key={item.id} {...item} id={item.id} />
-                  ))}
-                </div>
-              </>
+              // Display Notes Grid
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-4">
+                {notes.map((item) => (
+                  <NoteItems key={item.id} {...item} id={item.id} />
+                ))}
+              </div>
             )}
           </>
         )}

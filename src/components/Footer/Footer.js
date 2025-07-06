@@ -1,70 +1,104 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FaGithub, FaEnvelope, FaTwitter, FaLinkedinIn } from "react-icons/fa";
+import {
+  FaGithub,
+  FaEnvelope,
+  FaTwitter,
+  FaLinkedinIn,
+  FaHome,
+} from "react-icons/fa"; // Imported FaHome icon
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-headerColor py-6 lg:py-2 min-h-28 z-50 relative">
-      <div className="xl:px-10 sm:px-6 px-4 min-h-28 flex lg:flex-row flex-col lg:gap-0 gap-5 justify-between items-center">
-        <ul className="flex flex-1 md:gap-6 gap-4 text-white flex-row items-center">
+    <footer className="bg-gray-800 text-white py-8 z-50 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row justify-between items-center gap-6">
+        {/* Navigation Links */}
+        <ul className="flex flex-wrap justify-center lg:justify-start gap-x-6 gap-y-2 text-lg font-medium">
           <li>
-            <Link to="/about">
-              <span className="hover:underline">About Us</span>
+            {/* New Home Link */}
+            <Link
+              to="/"
+              className="hover:text-blue-400 transition-colors duration-300 flex items-center gap-1"
+            >
+              <FaHome size={18} /> Home
             </Link>
           </li>
           <li>
-            <Link to="/">
-              <span className="hover:underline">Services</span>
+            <Link
+              to="/about"
+              className="hover:text-blue-400 transition-colors duration-300"
+            >
+              About Us
             </Link>
           </li>
           <li>
-            <Link to="/contact">
-              <span className="hover:underline">Contact</span>
+            <Link
+              to="/"
+              className="hover:text-blue-400 transition-colors duration-300"
+            >
+              Services
             </Link>
           </li>
           <li>
-            <Link to="/">
-              <span className="hover:underline">Privacy Policy</span>
+            <Link
+              to="/contact"
+              className="hover:text-blue-400 transition-colors duration-300"
+            >
+              Contact
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/"
+              className="hover:text-blue-400 transition-colors duration-300"
+            >
+              Privacy Policy
             </Link>
           </li>
         </ul>
 
-        <p className="w-fit flex items-center text-white text-sm">
-          <span>&copy; {currentYear} SafeScribe | All rights reserved.</span>
+        {/* Copyright Information */}
+        <p className="text-sm text-gray-400 text-center flex-shrink-0">
+          <span>&copy; {currentYear} SafeScribe. All rights reserved.</span>
         </p>
 
-        <div className="flex-1 flex flex-row gap-6 lg:justify-end justify-start items-center">
+        {/* Social Media Icons */}
+        <div className="flex justify-center lg:justify-end gap-5">
           <a
             href="https://github.com/YourGitHubUsername"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white border h-10 w-10 flex justify-center items-center border-white rounded-full p-2 hover:bg-blue-600 transition-colors duration-300"
+            aria-label="GitHub"
+            className="text-gray-300 hover:text-white border-2 border-gray-600 hover:border-blue-500 rounded-full p-2 transition-all duration-300 transform hover:scale-110 flex items-center justify-center"
           >
-            <FaGithub size={20} />
+            <FaGithub size={22} />
           </a>
           <a
             href="mailto:your.email@gmail.com"
-            className="text-white border h-10 w-10 flex justify-center items-center border-white rounded-full p-2 hover:bg-blue-600 transition-colors duration-300"
+            className="text-gray-300 hover:text-white border-2 border-gray-600 hover:border-blue-500 rounded-full p-2 transition-all duration-300 transform hover:scale-110 flex items-center justify-center"
+            aria-label="Email"
           >
-            <FaEnvelope size={20} />
+            <FaEnvelope size={22} />
           </a>
           <a
             href="https://twitter.com/YourTwitterUsername"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white border h-10 w-10 flex justify-center items-center border-white rounded-full p-2 hover:bg-blue-600 transition-colors duration-300"
+            aria-label="Twitter"
+            className="text-gray-300 hover:text-white border-2 border-gray-600 hover:border-blue-500 rounded-full p-2 transition-all duration-300 transform hover:scale-110 flex items-center justify-center"
           >
-            <FaTwitter size={20} />
+            <FaTwitter size={22} />
           </a>
           <a
             href="https://linkedin.com/in/YourLinkedInUsername"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white border h-10 w-10 flex justify-center items-center border-white rounded-full p-2 hover:bg-blue-600 transition-colors duration-300"
+            aria-label="LinkedIn"
+            className="text-gray-300 hover:text-white border-2 border-gray-600 hover:border-blue-500 rounded-full p-2 transition-all duration-300 transform hover:scale-110 flex items-center justify-center"
           >
-            <FaLinkedinIn size={20} />
+            <FaLinkedinIn size={22} />
           </a>
         </div>
       </div>

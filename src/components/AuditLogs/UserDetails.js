@@ -2,23 +2,21 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import api from "../../services/api";
 import { useForm } from "react-hook-form";
-import InputField from "../InputField/InputField";
+import InputField from "../InputField/InputField"; // Assuming this is styled well
 import { Blocks } from "react-loader-spinner";
-import Buttons from "../../utils/Buttons";
+import Buttons from "../../utils/Buttons"; // Assuming this handles basic styling
 import toast from "react-hot-toast";
-import Errors from "../Errors";
+import Errors from "../Errors"; // Assuming this is styled well
 
-//This is where we will show the specific user details and also update the user details.
-
-//UserDetails component is used to show the user details and also update the user details
+// UserDetails component is used to show and update user details.
 const UserDetails = () => {
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm({ 
-  //useForm is a custom hook that helps to manage the form state and validation
+    reset, // Added reset to clear password field after successful update
+  } = useForm({
     defaultValues: {
       username: "",
       email: "",
@@ -27,7 +25,7 @@ const UserDetails = () => {
     mode: "onSubmit",
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Set initial loading to true as data is fetched on mount
   const [updateRoleLoader, setUpdateRoleLoader] = useState(false);
   const [passwordLoader, setPasswordLoader] = useState(false);
 
@@ -38,36 +36,28 @@ const UserDetails = () => {
   const [error, setError] = useState(null);
   const [isEditingPassword, setIsEditingPassword] = useState(false);
 
-  //fetch user details by using the userId from the url
+  // Fetches user details using the userId from the URL
   const fetchUserDetails = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.get(`/admin/user/${userId}`);
       setUser(response.data);
-
       setSelectedRole(response.data.role?.roleName || "");
     } catch (err) {
-      setError(err?.response?.data?.message);
+      setError(err?.response?.data?.message || "Failed to fetch user details.");
       console.error("Error fetching user details", err);
     } finally {
       setLoading(false);
     }
   }, [userId]);
 
-  useEffect(() => {
-    //if user exist set the value by using the setValue function provided my react-hook-form
-    if (user && Object.keys(user).length > 0) {
-      setValue("username", user.userName);
-      setValue("email", user.email);
-    }
-  }, [user, setValue]);
-
+  // Fetches available roles
   const fetchRoles = useCallback(async () => {
     try {
       const response = await api.get("/admin/roles");
       setRoles(response.data);
     } catch (err) {
-      setError(err?.response?.data?.message);
+      setError(err?.response?.data?.message || "Failed to fetch roles.");
       console.error("Error fetching roles", err);
     }
   }, []);
@@ -77,12 +67,19 @@ const UserDetails = () => {
     fetchRoles();
   }, [fetchUserDetails, fetchRoles]);
 
-  //set the selected role
+  // Set form values once user data is loaded
+  useEffect(() => {
+    if (user) {
+      setValue("username", user.userName);
+      setValue("email", user.email);
+    }
+  }, [user, setValue]);
+
   const handleRoleChange = (e) => {
     setSelectedRole(e.target.value);
   };
 
-  //handle update role
+  // Handles updating the user's role
   const handleUpdateRole = async () => {
     setUpdateRoleLoader(true);
     try {
@@ -95,17 +92,17 @@ const UserDetails = () => {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
-      fetchUserDetails();
-      toast.success("Update role successful");
+      fetchUserDetails(); // Re-fetch to display updated role
+      toast.success("User role updated successfully!");
     } catch (err) {
-      console.log(err);
-      toast.error("Update Role Failed");
+      console.error("Update Role Failed:", err);
+      toast.error(err?.response?.data?.message || "Failed to update role.");
     } finally {
       setUpdateRoleLoader(false);
     }
   };
 
-  //handle update the password
+  // Handles updating the user's password
   const handleSavePassword = async (data) => {
     setPasswordLoader(true);
     const newPassword = data.password;
@@ -121,34 +118,43 @@ const UserDetails = () => {
         },
       });
       setIsEditingPassword(false);
-      setValue("password", "");
-      //fetchUserDetails();
-      toast.success("password update success");
+      reset({ password: "" }); // Clear password field after successful update
+      toast.success("Password updated successfully!");
     } catch (err) {
-      toast.error("Error updating password " + err.response.data);
+      console.error("Error updating password:", err);
+      toast.error(err?.response?.data || "Failed to update password.");
     } finally {
       setPasswordLoader(false);
     }
   };
 
+  // Handles updating account statuses (lock, expire, enabled, credentialsExpire)
   const handleCheckboxChange = async (e, updateUrl) => {
     const { name, checked } = e.target;
+    setLoading(true); // Show loader for status updates
 
-    let message = null;
+    let message = `Account ${name} status updated successfully.`;
     if (name === "lock") {
-      message = "Update Account Lock status Successful";
+      message = `Account lock status updated to ${
+        checked ? "locked" : "unlocked"
+      }.`;
     } else if (name === "expire") {
-      message = "Update Account Expiry status Successful";
+      message = `Account expiry status updated to ${
+        checked ? "expired" : "not expired"
+      }.`;
     } else if (name === "enabled") {
-      message = "Update Account Enabled status Successful";
+      message = `Account enabled status updated to ${
+        checked ? "enabled" : "disabled"
+      }.`;
     } else if (name === "credentialsExpire") {
-      message = "Update Account Credentials Expired status Successful";
+      message = `Credentials expiry status updated to ${
+        checked ? "expired" : "not expired"
+      }.`;
     }
 
     try {
       const formData = new URLSearchParams();
       formData.append("userId", userId);
-
       formData.append(name, checked);
 
       await api.put(updateUrl, formData, {
@@ -156,13 +162,15 @@ const UserDetails = () => {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
-      fetchUserDetails();
+      fetchUserDetails(); // Re-fetch to reflect new status
       toast.success(message);
     } catch (err) {
-      toast.error(err?.response?.data?.message);
-      console.log(`Error updating ${name}:`);
+      console.error(`Error updating ${name}:`, err);
+      toast.error(
+        err?.response?.data?.message || `Failed to update ${name} status.`
+      );
     } finally {
-      message = null;
+      setLoading(false); // Hide loader
     }
   };
 
@@ -171,99 +179,99 @@ const UserDetails = () => {
   }
 
   return (
-    <div className="sm:px-12 px-4 py-10   ">
-      {loading ? (
-        <>
-          {" "}
-          <div className="flex  flex-col justify-center items-center  h-72">
-            <span>
-              <Blocks
-                height="70"
-                width="70"
-                color="#4fa94d"
-                ariaLabel="blocks-loading"
-                wrapperStyle={{}}
-                wrapperClass="blocks-wrapper"
-                visible={true}
-              />
-            </span>
-            <span>Please wait...</span>
-          </div>
-        </>
+    <div className="sm:px-8 px-4 py-8 bg-gray-100 min-h-[calc(100vh-74px)]">
+      {" "}
+      {/* Added background color for the page */}
+      {loading && !user ? ( // Only show full-page loader if user data is initially loading
+        <div className="flex flex-col justify-center items-center h-72">
+          <span>
+            <Blocks
+              height="70"
+              width="70"
+              color="#4fa94d"
+              ariaLabel="blocks-loading"
+              visible={true}
+            />
+          </span>
+          <span className="text-gray-700 mt-2 font-medium">
+            Fetching user details...
+          </span>
+        </div>
       ) : (
-        <>
-          <div className="lg:w-[70%] sm:w-[90%] w-full  mx-auto shadow-lg shadow-gray-300 p-8 rounded-md">
-            <div>
-              <h1 className="text-slate-800 text-2xl font-bold  pb-4">
+        user && ( // Only render content if user data is available
+          <>
+            {/* Profile Information Section */}
+            <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 border-b pb-4 mb-6">
                 Profile Information
-                <hr />
-              </h1>
+              </h2>
               <form
-                className="flex  flex-col  gap-2  "
                 onSubmit={handleSubmit(handleSavePassword)}
+                className="space-y-4"
               >
                 <InputField
-                  label="UserName"
+                  label="Username"
                   required
                   id="username"
-                  className="w-full"
                   type="text"
-                  message="*UserName is required"
-                  placeholder="Enter your UserName"
+                  message="Username is required"
+                  placeholder="Enter username"
                   register={register}
                   errors={errors}
-                  readOnly
+                  readOnly // Username should typically not be editable here
                 />
                 <InputField
                   label="Email"
                   required
                   id="email"
-                  className="flex-1"
                   type="text"
-                  message="*Email is required"
-                  placeholder="Enter your Email"
+                  message="Email is required"
+                  placeholder="Enter email"
                   register={register}
                   errors={errors}
-                  readOnly
+                  readOnly // Email should typically not be editable here
                 />
                 <InputField
                   label="Password"
                   required
                   autoFocus={isEditingPassword}
                   id="password"
-                  className="w-full"
                   type="password"
-                  message="*Password is required"
-                  placeholder="Enter your Password"
+                  message="Password is required and must be at least 6 characters"
+                  placeholder={
+                    isEditingPassword
+                      ? "Enter new password (min 6 chars)"
+                      : "••••••••"
+                  }
                   register={register}
                   errors={errors}
                   readOnly={!isEditingPassword}
-                  min={6}
-                />{" "}
+                  minLength={6} // Added minLength validation
+                />
+
                 {!isEditingPassword ? (
                   <Buttons
                     type="button"
-                    onClickhandler={() =>
-                      setIsEditingPassword(!isEditingPassword)
-                    }
-                    className="bg-customRed mb-0 w-fit px-4 py-2 rounded-md text-white"
+                    onClickhandler={() => setIsEditingPassword(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md transition-colors duration-200"
                   >
-                    Click To Edit Password
+                    Change Password
                   </Buttons>
                 ) : (
-                  <div className="flex items-center gap-2 ">
+                  <div className="flex items-center gap-4">
                     <Buttons
                       type="submit"
-                      className="bg-btnColor mb-0 w-fit px-4 py-2 rounded-md text-white"
+                      className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-md transition-colors duration-200"
                     >
-                      {passwordLoader ? "Loading.." : "Save"}
+                      {passwordLoader ? "Saving..." : "Save New Password"}
                     </Buttons>
                     <Buttons
                       type="button"
-                      onClickhandler={() =>
-                        setIsEditingPassword(!isEditingPassword)
-                      }
-                      className="bg-customRed mb-0 w-fit px-4 py-2 rounded-md text-white"
+                      onClickhandler={() => {
+                        setIsEditingPassword(false);
+                        setValue("password", ""); // Clear password field on cancel
+                      }}
+                      className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-md transition-colors duration-200"
                     >
                       Cancel
                     </Buttons>
@@ -271,110 +279,132 @@ const UserDetails = () => {
                 )}
               </form>
             </div>
-          </div>
-          <div className="lg:w-[70%] sm:w-[90%] w-full  mx-auto shadow-lg shadow-gray-300 p-8 rounded-md">
-            <h1 className="text-slate-800 text-2xl font-bold  pb-4">
-              Admin Actions
-              <hr />
-            </h1>
 
-            <div className="py-4 flex sm:flex-row flex-col sm:items-center items-start gap-4">
-              <div className="flex items-center gap-2">
-                <label className="text-slate-600 text-lg font-semibold ">
-                  Role:{" "}
-                </label>
-                <select
-                  className=" px-8 py-1 rounded-md  border-2 uppercase border-slate-600  "
-                  value={selectedRole}
-                  onChange={handleRoleChange}
+            {/* Admin Actions Section */}
+            <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
+              <h2 className="text-2xl font-bold text-gray-800 border-b pb-4 mb-6">
+                Admin Actions
+              </h2>
+
+              {/* Role Update */}
+              <div className="mb-6">
+                <div className="flex flex-col sm:flex-row sm:items-center items-start gap-4 mb-4">
+                  <label
+                    htmlFor="role-select"
+                    className="text-gray-700 text-lg font-medium mr-2"
+                  >
+                    User Role:
+                  </label>
+                  <select
+                    id="role-select"
+                    className="flex-grow max-w-xs px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-800 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 uppercase"
+                    value={selectedRole}
+                    onChange={handleRoleChange}
+                  >
+                    {roles.map((role) => (
+                      <option key={role.roleId} value={role.roleName}>
+                        {role.roleName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <Buttons
+                  type="button"
+                  onClickhandler={handleUpdateRole}
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded-md transition-colors duration-200"
                 >
-                  {roles.map((role) => (
-                    <option
-                      className="bg-slate-200 flex flex-col gap-4 uppercase text-slate-700"
-                      key={role.roleId}
-                      value={role.roleName}
-                    >
-                      {role.roleName}
-                    </option>
-                  ))}
-                </select>
+                  {updateRoleLoader ? "Updating..." : "Update Role"}
+                </Buttons>
               </div>
-              <button
-                className="bg-btnColor hover:text-slate-300 px-4 py-2 rounded-md text-white "
-                onClick={handleUpdateRole}
-              >
-                {updateRoleLoader ? "Loading..." : "Update Role"}
-              </button>
-            </div>
 
-            <hr className="py-2" />
-            <div className="flex flex-col gap-4 py-4">
-              <div className="flex items-center gap-2">
-                <label className="text-slate-600 text-sm font-semibold uppercase">
-                  {" "}
-                  Lock Account
-                </label>
-                <input
-                  className="text-14 w-5 h-5"
-                  type="checkbox"
-                  name="lock"
-                  checked={!user?.accountNonLocked}
-                  onChange={(e) =>
-                    handleCheckboxChange(e, "/admin/update-lock-status")
-                  }
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="text-slate-600 text-sm font-semibold uppercase">
-                  {" "}
-                  Account Expiry
-                </label>
-                <input
-                  className="text-14 w-5 h-5"
-                  type="checkbox"
-                  name="expire"
-                  checked={!user?.accountNonExpired}
-                  onChange={(e) =>
-                    handleCheckboxChange(e, "/admin/update-expiry-status")
-                  }
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="text-slate-600 text-sm font-semibold uppercase">
-                  {" "}
-                  Account Enabled
-                </label>
-                <input
-                  className="text-14 w-5 h-5"
-                  type="checkbox"
-                  name="enabled"
-                  checked={user?.enabled}
-                  onChange={(e) =>
-                    handleCheckboxChange(e, "/admin/update-enabled-status")
-                  }
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="text-slate-600 text-sm font-semibold uppercase">
-                  {" "}
-                  Credentials Expired
-                </label>
-                <input
-                  className="text-14 w-5 h-5"
-                  type="checkbox"
-                  name="credentialsExpire"
-                  checked={!user?.credentialsNonExpired}
-                  onChange={(e) =>
-                    handleCheckboxChange(
-                      e,
-                      `/admin/update-credentials-expiry-status?userId=${userId}&expire=${user?.credentialsNonExpired}`
-                    )
-                  }
-                />
+              <hr className="my-6" />
+
+              {/* Account Status Checkboxes */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  Account Status
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3">
+                    <input
+                      id="lock-account"
+                      className="form-checkbox h-5 w-5 text-red-600 rounded focus:ring-red-500"
+                      type="checkbox"
+                      name="lock"
+                      checked={!user?.accountNonLocked}
+                      onChange={(e) =>
+                        handleCheckboxChange(e, "/admin/update-lock-status")
+                      }
+                    />
+                    <label
+                      htmlFor="lock-account"
+                      className="text-gray-700 font-medium cursor-pointer"
+                    >
+                      Lock Account
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input
+                      id="account-expiry"
+                      className="form-checkbox h-5 w-5 text-yellow-600 rounded focus:ring-yellow-500"
+                      type="checkbox"
+                      name="expire"
+                      checked={!user?.accountNonExpired}
+                      onChange={(e) =>
+                        handleCheckboxChange(e, "/admin/update-expiry-status")
+                      }
+                    />
+                    <label
+                      htmlFor="account-expiry"
+                      className="text-gray-700 font-medium cursor-pointer"
+                    >
+                      Account Expired
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input
+                      id="account-enabled"
+                      className="form-checkbox h-5 w-5 text-green-600 rounded focus:ring-green-500"
+                      type="checkbox"
+                      name="enabled"
+                      checked={user?.enabled}
+                      onChange={(e) =>
+                        handleCheckboxChange(e, "/admin/update-enabled-status")
+                      }
+                    />
+                    <label
+                      htmlFor="account-enabled"
+                      className="text-gray-700 font-medium cursor-pointer"
+                    >
+                      Account Enabled
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input
+                      id="credentials-expired"
+                      className="form-checkbox h-5 w-5 text-orange-600 rounded focus:ring-orange-500"
+                      type="checkbox"
+                      name="credentialsExpire"
+                      checked={!user?.credentialsNonExpired}
+                      onChange={(e) =>
+                        handleCheckboxChange(
+                          e,
+                          `/admin/update-credentials-expiry-status`
+                        )
+                      }
+                    />
+                    <label
+                      htmlFor="credentials-expired"
+                      className="text-gray-700 font-medium cursor-pointer"
+                    >
+                      Credentials Expired
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </>
+          </>
+        )
       )}
     </div>
   );
