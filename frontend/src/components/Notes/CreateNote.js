@@ -132,37 +132,67 @@ const CreateNote = () => {
     };
 
     const handleInsertIntoMainEditor = (contentToInsert, type, query) => {
-        if (!mainQuillRef.current) return;
-
-        const editor = mainQuillRef.current.getEditor();
-        const currentLength = editor.getLength();
-
-        let separatorText = "";
-        if (type === "explanation") {
-            separatorText = `--- AI Explanation for '${query}' ---`;
-        } else if (type === "answer") {
-            separatorText = `--- AI Answer for '${query}' ---`;
+        if (!mainQuillRef.current) {
+            console.error("Main Quill ref is not available");
+            return;
         }
 
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML =
-            `<p><br/></p><hr style="border-top: 1px dashed #ccc; margin: 20px 0;"/><p><strong>${separatorText}</strong></p><p><br/></p>` +
-            contentToInsert;
-        const tempQuill = new Quill(tempDiv);
-        const deltaToInsert = tempQuill.getContents();
+        const editor = mainQuillRef.current.getEditor();
+        if (!editor) {
+            console.error("Editor instance is not available");
+            return;
+        }
 
-        editor.updateContents(
-            new Quill.import("delta")()
-                .retain(currentLength - 1)
-                .concat(deltaToInsert)
-        );
+        try {
+            // Get current cursor position or end of document
+            const selection = editor.getSelection();
+            const insertIndex = selection ? selection.index : editor.getLength() - 1;
 
-        setEditorContent(editor.getContents());
-        toast.success(`AI ${type} inserted into your note!`);
+            let separatorText = "";
+            if (type === "explanation") {
+                separatorText = `AI Explanation for '${query}'`;
+            } else if (type === "answer") {
+                separatorText = `AI Answer for '${query}'`;
+            }
 
-        if (type === "explanation") setCurrentExplanation(null);
-        if (type === "answer") setCurrentAnswer(null);
-        setActiveAITab(null);
+            // Create the content to insert
+            const contentHtml = `
+            <p><br/></p>
+            <hr style="border-top: 1px dashed #ccc; margin: 20px 0;"/>
+            <p><strong>${separatorText}</strong></p>
+            <p><br/></p>
+            ${contentToInsert}
+            <p><br/></p>
+        `;
+
+            // Insert the HTML content
+            editor.clipboard.dangerouslyPasteHTML(insertIndex, contentHtml);
+
+            // Update the state with the new content
+            const newContent = editor.root.innerHTML;
+            setEditorContent(newContent);
+
+            // Set cursor position after the inserted content
+            const newLength = editor.getLength();
+            editor.setSelection(newLength - 1, 0);
+
+            toast.success(`AI ${type} inserted into your note!`);
+
+            // Clear the current content and reset active tab
+            if (type === "explanation") {
+                setCurrentExplanation(null);
+                setAiExplanationQuery("");
+            }
+            if (type === "answer") {
+                setCurrentAnswer(null);
+                setAiAnswerQuestion("");
+            }
+            setActiveAITab(null);
+
+        } catch (error) {
+            console.error("Error inserting content:", error);
+            toast.error("Failed to insert content. Please try again.");
+        }
     };
 
     return (
