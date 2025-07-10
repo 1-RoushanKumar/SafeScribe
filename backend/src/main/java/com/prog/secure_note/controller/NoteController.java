@@ -45,4 +45,12 @@ public class NoteController {
         String username = userDetails.getUsername();
         noteService.deleteNoteForUser(noteId, username);
     }
+
+    // NEW: Endpoint to get a single note by ID
+    @GetMapping("/{noteId}")
+    public Note getNoteById(@PathVariable Long noteId,
+                            @AuthenticationPrincipal UserDetails userDetails) {
+        String username = userDetails.getUsername();
+        return noteService.getNoteByIdForUser(noteId, username);
+    }
 }
