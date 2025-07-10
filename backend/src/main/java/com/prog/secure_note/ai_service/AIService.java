@@ -295,13 +295,11 @@ public class AIService {
                 if (request.getQuestion() == null || request.getQuestion().isEmpty()) {
                     throw new IllegalArgumentException("Question/Topic is required for 'similar' operation (explanation).");
                 }
-                prompt.append("Provide a comprehensive, detailed, and factual explanation of the following concept or topic. ")
-                        .append("Include its definition, key principles, historical context (if relevant), main theories, significant discoveries, and real-world applications. ")
-                        .append("Structure your response using **Markdown format** with clear headings (e.g., `## Heading`), bold text (e.g., `**text**`), and bullet points (e.g., `* item`). ")
-                        .append("Aim for a detailed academic overview suitable for a research note. ")
-                        .append("Do not include any introductory or concluding sentences outside the main explanation. ")
-                        .append("If the topic is too broad or cannot be explained concisely, focus on its most fundamental aspects.\n\n")
-                        .append("Concept/Topic: ").append(request.getQuestion());
+                prompt.append("Provide a concise explanation of the following topic. ")
+                        .append("Include: brief definition, 2-3 key points, and main applications. ")
+                        .append("Use **Markdown formatting** with headings (## Title) and bullet points (* item). ")
+                        .append("Keep the response under 250 words and focus only on essential information.\n\n")
+                        .append("Topic: ").append(request.getQuestion());
                 break;
 
             default:
