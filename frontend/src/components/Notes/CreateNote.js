@@ -6,41 +6,36 @@ import {
     MdLightbulb,
     MdQuestionAnswer,
     MdOutlineContentPaste,
-} from "react-icons/md"; // Added MdOutlineContentPaste for paste icon
+} from "react-icons/md";
 import {useNavigate} from "react-router-dom";
 import api from "../../services/api";
 import Buttons from "../../utils/Buttons";
 import toast from "react-hot-toast";
 import {ClipLoader} from "react-spinners";
 import {marked} from "marked";
-import Quill from "quill"; // For rich text selection handling
+import Quill from "quill";
 
 const CreateNote = () => {
     const navigate = useNavigate();
     const [editorContent, setEditorContent] = useState("");
     const [loading, setLoading] = useState(false);
 
-    // States for AI Explanation section
     const [aiExplanationQuery, setAiExplanationQuery] = useState("");
     const [aiExplanationLoading, setAiExplanationLoading] = useState(false);
-    const [currentExplanation, setCurrentExplanation] = useState(null); // Holds HTML content for explanation
+    const [currentExplanation, setCurrentExplanation] = useState(null);
 
-    // States for AI Answer section
     const [aiAnswerQuestion, setAiAnswerQuestion] = useState("");
     const [aiAnswerLoading, setAiAnswerLoading] = useState(false);
-    const [currentAnswer, setCurrentAnswer] = useState(null); // Holds HTML content for answer
+    const [currentAnswer, setCurrentAnswer] = useState(null);
 
-    // Combined state to control which AI output is visible (if any)
-    const [activeAITab, setActiveAITab] = useState(null); // 'explanation', 'answer', or null
+    const [activeAITab, setActiveAITab] = useState(null);
 
-    const mainQuillRef = useRef(null); // Ref for the main editor to insert content
+    const mainQuillRef = useRef(null);
 
-    // Handles content change in the main editor
-    const handleChange = (content, delta, source, editor) => {
+    const handleChange = (content) => {
         setEditorContent(content);
     };
 
-    // Submits the main note
     const handleSubmit = async () => {
         const plainTextContent = editorContent.replace(/<[^>]*>/g, "").trim();
         if (plainTextContent.length === 0) {
@@ -61,16 +56,15 @@ const CreateNote = () => {
         }
     };
 
-    // Fetches AI Explanation
     const handleGetExplanation = async () => {
         if (aiExplanationQuery.trim().length === 0) {
             return toast.error("Please enter a concept or topic for explanation.");
         }
 
         setAiExplanationLoading(true);
-        setCurrentExplanation(null); // Clear previous explanation
-        setCurrentAnswer(null); // Clear any active answer
-        setActiveAITab(null); // Hide any previous AI output
+        setCurrentExplanation(null);
+        setCurrentAnswer(null);
+        setActiveAITab(null);
         try {
             const response = await api.post("/research/process", {
                 operation: "similar",
@@ -86,7 +80,7 @@ const CreateNote = () => {
             ) {
                 const htmlExplanation = marked.parse(aiExplanationMarkdown);
                 setCurrentExplanation(htmlExplanation);
-                setActiveAITab("explanation"); // Show explanation output
+                setActiveAITab("explanation");
             } else {
                 toast.error("AI could not provide a relevant explanation.");
             }
@@ -98,16 +92,15 @@ const CreateNote = () => {
         }
     };
 
-    // Fetches AI Answer
     const handleGetAnswer = async () => {
         if (aiAnswerQuestion.trim().length === 0) {
             return toast.error("Please enter a question for the AI to answer.");
         }
 
         setAiAnswerLoading(true);
-        setCurrentAnswer(null); // Clear previous answer
-        setCurrentExplanation(null); // Clear any active explanation
-        setActiveAITab(null); // Hide any previous AI output
+        setCurrentAnswer(null);
+        setCurrentExplanation(null);
+        setActiveAITab(null);
         try {
             const response = await api.post("/research/process", {
                 operation: "answer",
@@ -121,13 +114,12 @@ const CreateNote = () => {
                 typeof aiAnswerText === "string" &&
                 aiAnswerText.trim().length > 0
             ) {
-                // For plain text answers, format for Quill
                 const formattedAnswer = `<p>${aiAnswerText.replace(
                     /\n/g,
                     "</p><p>"
                 )}</p>`;
                 setCurrentAnswer(formattedAnswer);
-                setActiveAITab("answer"); // Show answer output
+                setActiveAITab("answer");
             } else {
                 toast.error("AI could not provide a relevant answer.");
             }
@@ -139,12 +131,11 @@ const CreateNote = () => {
         }
     };
 
-    // Inserts content directly into the main editor
     const handleInsertIntoMainEditor = (contentToInsert, type, query) => {
         if (!mainQuillRef.current) return;
 
         const editor = mainQuillRef.current.getEditor();
-        const currentLength = editor.getLength(); // Get current length to insert at end
+        const currentLength = editor.getLength();
 
         let separatorText = "";
         if (type === "explanation") {
@@ -153,13 +144,6 @@ const CreateNote = () => {
             separatorText = `--- AI Answer for '${query}' ---`;
         }
 
-        // Convert separator and content to Delta format for insertion
-        // Use Quill's clipboard.dangerouslyPasteHTML to insert raw HTML
-        // However, for clean integration, it's better to insert as Delta
-        // or set HTML if replacing entire content. Appending HTML requires converting to Delta.
-
-        // Better way to append complex HTML:
-        // Create a temporary Quill instance to convert the HTML string to Delta
         const tempDiv = document.createElement("div");
         tempDiv.innerHTML =
             `<p><br/></p><hr style="border-top: 1px dashed #ccc; margin: 20px 0;"/><p><strong>${separatorText}</strong></p><p><br/></p>` +
@@ -169,14 +153,13 @@ const CreateNote = () => {
 
         editor.updateContents(
             new Quill.import("delta")()
-                .retain(currentLength - 1) // Go to the end of the current content (adjust for trailing newline)
+                .retain(currentLength - 1)
                 .concat(deltaToInsert)
         );
 
-        setEditorContent(editor.getContents()); // Update React state with new editor content
+        setEditorContent(editor.getContents());
         toast.success(`AI ${type} inserted into your note!`);
 
-        // Optionally clear the AI output from the right panel after insertion
         if (type === "explanation") setCurrentExplanation(null);
         if (type === "answer") setCurrentAnswer(null);
         setActiveAITab(null);
@@ -186,13 +169,11 @@ const CreateNote = () => {
         <div className="min-h-screen bg-gray-100 p-6 sm:p-8 lg:p-10 font-sans">
             <div
                 className="max-w-8xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col lg:flex-row h-[calc(100vh-4rem)]">
-                {" "}
-                {/* Added flex-row for layout */}
                 {/* Left Column: Create Note Section (Editor) */}
-                <div className="w-full lg:w-2/3 p-6 sm:p-8 flex flex-col border-r border-gray-200">
+                <div className="w-full lg:w-2/3 p-4 sm:p-4 flex flex-col border-r border-gray-200">
                     {/* Header Section */}
                     <div
-                        className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-700 text-white p-2 sm:p-4 rounded-lg shadow-md mb-4">
+                        className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-700 text-white p-2 sm:p-2 rounded-lg shadow-md mb-2">
                         <MdNoteAdd className="text-4xl sm:text-5xl text-blue-200"/>
                         <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
                             Create New Note
@@ -203,8 +184,8 @@ const CreateNote = () => {
                     <div
                         className="flex-grow mb-6 border border-gray-200 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md overflow-hidden">
                         <ReactQuill
-                            ref={mainQuillRef} // Assign ref to the main editor
-                            className="h-full" // Make it take full height of its container
+                            ref={mainQuillRef}
+                            className="h-full"
                             theme="snow"
                             value={editorContent}
                             onChange={handleChange}
@@ -213,12 +194,7 @@ const CreateNote = () => {
                                     [{header: [1, 2, 3, 4, 5, 6, false]}],
                                     [{size: ["small", false, "large", "huge"]}],
                                     ["bold", "italic", "underline", "strike", "blockquote"],
-                                    [
-                                        {list: "ordered"},
-                                        {list: "bullet"},
-                                        {indent: "-1"},
-                                        {indent: "+1"},
-                                    ],
+                                    [{list: "ordered"}, {list: "bullet"}, {indent: "-1"}, {indent: "+1"}],
                                     ["link", "image"],
                                     [{color: []}, {background: []}],
                                     [{align: []}],
@@ -241,20 +217,18 @@ const CreateNote = () => {
                                     <span>Creating...</span>
                                 </>
                             ) : (
-                                "Save Note" // Changed from "Create Note" to "Save Note" for clarity
+                                "Save Note"
                             )}
                         </Buttons>
                     </div>
                 </div>
-                {" "}
-                {/* End Left Column */}
+
                 {/* Right Column: AI Sections and Output */}
                 <div className="w-full lg:w-1/3 p-6 sm:p-8 flex flex-col bg-gray-50 overflow-y-auto">
-                    {" "}
-                    {/* Added overflow-y-auto */}
                     <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 pb-4 border-b border-gray-200">
                         AI Assistance
                     </h2>
+
                     {/* AI Explanation Section */}
                     <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 shadow-md mb-8">
                         <div className="flex items-center gap-3 mb-4">
@@ -262,8 +236,8 @@ const CreateNote = () => {
                             <h3 className="text-xl font-bold text-gray-800">
                                 AI Explanation{" "}
                                 <span className="text-sm text-gray-600 font-normal">
-                  (Concepts, Theories)
-                </span>
+                                    (Concepts, Theories)
+                                </span>
                             </h3>
                         </div>
                         <div className="flex flex-col gap-4">
@@ -296,6 +270,7 @@ const CreateNote = () => {
                             </Buttons>
                         </div>
                     </div>
+
                     {/* AI Answer Section */}
                     <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-6 shadow-md mb-8">
                         <div className="flex items-center gap-3 mb-4">
@@ -303,8 +278,8 @@ const CreateNote = () => {
                             <h3 className="text-xl font-bold text-gray-800">
                                 AI Answer{" "}
                                 <span className="text-sm text-gray-600 font-normal">
-                  (Factual Questions)
-                </span>
+                                    (Factual Questions)
+                                </span>
                             </h3>
                         </div>
                         <div className="flex flex-col gap-4">
@@ -337,6 +312,7 @@ const CreateNote = () => {
                             </Buttons>
                         </div>
                     </div>
+
                     {/* AI Output Display Area */}
                     {activeAITab === "explanation" && currentExplanation && (
                         <div
@@ -345,12 +321,10 @@ const CreateNote = () => {
                                 AI Explanation for "{aiExplanationQuery}"
                             </h3>
                             <div className="flex-grow overflow-y-auto custom-scrollbar">
-                                {" "}
-                                {/* Added custom-scrollbar for styling scrollbar */}
                                 <ReactQuill
                                     value={currentExplanation}
-                                    readOnly={true} // Read-only for display
-                                    theme="bubble" // Use 'bubble' theme for cleaner display without toolbar
+                                    readOnly={true}
+                                    theme="bubble"
                                     modules={{toolbar: false}}
                                     className="text-gray-800"
                                 />
@@ -380,8 +354,8 @@ const CreateNote = () => {
                             <div className="flex-grow overflow-y-auto custom-scrollbar">
                                 <ReactQuill
                                     value={currentAnswer}
-                                    readOnly={true} // Read-only for display
-                                    theme="bubble" // Use 'bubble' theme for cleaner display without toolbar
+                                    readOnly={true}
+                                    theme="bubble"
                                     modules={{toolbar: false}}
                                     className="text-gray-800"
                                 />
@@ -403,8 +377,6 @@ const CreateNote = () => {
                         </div>
                     )}
                 </div>
-                {" "}
-                {/* End Right Column */}
             </div>
         </div>
     );
