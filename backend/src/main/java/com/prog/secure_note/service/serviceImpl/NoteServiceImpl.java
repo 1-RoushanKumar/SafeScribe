@@ -57,6 +57,17 @@ public class NoteServiceImpl implements NoteService {
                 .findByOwnerUsername(username);
         return personalNotes;
     }
+
+    @Override
+    public Note getNoteByIdForUser(Long noteId, String username) {
+        Note note = noteRepository.findById(noteId).orElseThrow(()
+                -> new RuntimeException("Note not found with ID: " + noteId));
+        // Crucial security check: Ensure the fetched note belongs to the authenticated user
+        if (!note.getOwnerUsername().equals(username)) {
+            throw new RuntimeException("Access Denied: You do not have permission to view this note.");
+        }
+        return note;
+    }
 }
 
 

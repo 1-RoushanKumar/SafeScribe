@@ -12,6 +12,8 @@ public interface NoteService {
     void deleteNoteForUser(Long noteId, String username);
 
     List<Note> getNotesForUser(String username);
+
+    Note getNoteByIdForUser(Long noteId, String username);
 }
 
 //here i simply written a simple crud operation.
