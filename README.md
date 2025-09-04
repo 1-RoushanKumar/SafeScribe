@@ -67,7 +67,7 @@ A secure, feature-rich note-taking application with multi-layered authentication
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/safescribe.git
+git clone https://github.com/1-RoushanKumar/SafeScribe.git
 cd safescribe
 ```
 
@@ -210,55 +210,6 @@ safescribe/
 - **Language Translation**: Translate notes to multiple languages
 - **Text-to-Speech**: Convert notes to audio
 
-## 📊 Database Schema
-
-### Users Table
-- `id`, `username`, `email`, `password`
-- `account_non_locked`, `account_non_expired`
-- `credentials_non_expired`, `enabled`
-- `two_factor_secret`, `is_two_factor_enabled`
-- `signup_method`, `role`, `created_date`, `updated_date`
-
-### Notes Table
-- `id`, `content`, `owner_username`
-- `created_date`, `updated_date`
-
-### Audit Logs Table
-- `id`, `action`, `username`, `note_id`
-- `note_content`, `timestamp`
-
-### Contact Messages Table
-- `id`, `name`, `email`, `message`
-- `timestamp`, `status`
-
-## 🎯 Usage
-
-### For Regular Users
-1. **Sign Up**: Create account with email or use OAuth2
-2. **Enable 2FA**: Optional extra security layer
-3. **Create Notes**: Write and organize your thoughts
-4. **AI Assistance**: Get suggestions, summaries, and translations
-5. **Manage Account**: Update profile and security settings
-
-### For Administrators
-1. **User Management**: View and manage user accounts
-2. **System Monitoring**: Track user activities through audit logs
-3. **Role Assignment**: Assign admin roles to trusted users
-4. **Account Control**: Lock suspicious accounts when needed
-
-## 🚦 Testing
-
-### Manual Testing Checklist
-- [ ] User registration and login
-- [ ] OAuth2 login (Google & GitHub)
-- [ ] Two-factor authentication setup and verification
-- [ ] Note CRUD operations
-- [ ] AI features (suggestions, summarization, translation)
-- [ ] Password reset functionality
-- [ ] Admin operations
-- [ ] Account lockout scenarios
-- [ ] JWT token expiration handling
-
 ### API Testing
 Use Postman or similar tools to test API endpoints:
 ```bash
@@ -311,10 +262,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-**Project Maintainer**: [Your Name]
-- Email: your.email@example.com
-- LinkedIn: [Your LinkedIn Profile]
-- GitHub: [@yourusername](https://github.com/yourusername)
+**Project Maintainer**: Roushan Kumar
+- Email: rk04393@gmail.com
+- LinkedIn: https://www.linkedin.com/in/roushan-kumar-b2b79b282/
+- GitHub: https://github.com/1-RoushanKumar
 
 ## 🙏 Acknowledgments
 
@@ -323,22 +274,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Google for Gemini AI API and OAuth2 services
 - GitHub for OAuth2 integration
 - MySQL team for the reliable database system
-
-## 📋 Future Enhancements
-
-- [ ] Real-time collaborative editing
-- [ ] Note categories and tags
-- [ ] File attachments support
-- [ ] Mobile application (React Native)
-- [ ] Advanced search functionality
-- [ ] Note templates
-- [ ] Export functionality (PDF, Word)
-- [ ] Dark mode support
-- [ ] Notification system
-- [ ] Note sharing capabilities
-
 ---
 
 ⭐ **Star this repository if you find it helpful!**
 
-Made with ❤️ by [Your Name]
+Made with ❤️ by Roushan Kumar
